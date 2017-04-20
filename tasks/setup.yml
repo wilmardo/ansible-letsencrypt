@@ -1,0 +1,43 @@
+---
+- name: SETUP | Install epel-release
+  yum:
+    name: epel-release
+    state: latest
+    update_cache: yes
+  when: ansible_distribution == 'Centos' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+- name: SETUP | Update apt cache
+  apt:
+    update_cache: yes
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- block:
+    - name: SETUP | Install letsencrypt (if not Debian)
+      package:
+        name: letsencrypt
+        state: latest
+      when: ansible_distribution != 'Debian'
+
+    - name: LETSENCRYPT | Apt install letsencrypt jessie backport
+      command: DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install letsencrypt -t jessie-backports
+      when: ansible_distribution == 'Debian'
+
+  when: letsencrypt_webserver == 'nginx'
+
+- block:
+    - name: SETUP | Install letsencrypt (if not Debian)
+      package:
+        name: python-letsencrypt-apache
+        state: latest
+      when: ansible_distribution != 'Debian'
+
+    - name: SETUP | Apt install letsencrypt jessie backport
+      command: DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install python-letsencrypt-apache -t jessie-backports
+      when: ansible_distribution == 'Debian'
+
+  when: letsencrypt_webserver == 'apache'
+
+- name: SETUP | Create cli.ini
+  template:
+    src: cli.ini.jinja2
+    dest: /etc/letsencrypt/cli.ini

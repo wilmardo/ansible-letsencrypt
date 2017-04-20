@@ -1,0 +1,8 @@
+---
+- name: CRON | Add cron job for 'letsencrypt renew' (if configured).
+  cron:
+    name: letsencrypt automatic renewal.
+    job: "{{ letsencrypt_dir }}/letsencrypt renew --quiet --no-self-upgrade"
+    minute: "{{ letsencrypt_auto_renew_minute }}"
+    hour: "{{ letsencrypt_auto_renew_hour }}"
+    user: "{{ letsencrypt_auto_renew_user }}"

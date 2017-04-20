@@ -1,0 +1,36 @@
+---
+- block:
+    - name: CERTS | Create certs when using webroot
+      command: "letsencrypt certonly --webroot -w {{ item.value.webroot }} -d {{ item.value.url }}"
+      with_dict: "{{ letsencrypt_certs }}"
+      when: letsencrypt_certs is defined and item.value.webroot is defined
+
+    - block:
+        - name: CERTS | Stop nginx
+          service:
+            name: nginx
+            state: stopped
+
+        - name: CERTS | Create certs when using certonly
+          command: "letsencrypt certonly --standalone -d {{ item.value.url }}"
+          with_dict: "{{ letsencrypt_certs }}"
+
+        - name: CERTS | Start nginx
+          service:
+            name: nginx
+            state: started
+
+      when: letsencrypt_certs is defined
+
+  when: letsencrypt_webserver == 'nginx' or (letsencrypt_apache_autoinstall == no and letsencrypt_apache_autogenerate == no)
+
+- block:
+    - name: CERTS | Install certs for each Apache vhost
+      command: certbot --apache
+      when: letsencrypt_apache_autoinstall
+
+    - name: CERTS | Generate certs for each Apache vhost
+      command: certbot --apache
+      when: letsencrypt_apache_autogenerate
+
+  when: letsencrypt_webserver is 'apache'
