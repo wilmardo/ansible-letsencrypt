@@ -1,9 +1,9 @@
 ---
 - fail: msg="Variable '{{ item }}' is not defined"
-     when: item not in hostvars[inventory_hostname]
-     with_items:
-       - letsencrypt_certs
-       - letsencrypt_email
+  when: item not in hostvars[inventory_hostname]
+  with_items:
+   - letsencrypt_certs
+   - letsencrypt_email
 
 - include: setup.yml
 - include: certs.yml

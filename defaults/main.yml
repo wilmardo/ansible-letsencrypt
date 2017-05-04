@@ -5,9 +5,9 @@ letsencrypt_apache_autoinstall: no
 letsencrypt_apache_autogenerate: no
 
 # Certbot vars
-letsencrypt_email: undefined
-letsencrypt_rsa-key-size: 2048
-letsencrypt_single_webroot: undefined
+letsencrypt_email: none
+letsencrypt_rsa_key_size: 2048
+letsencrypt_single_webroot: none
 letsencrypt_extra_conf: ""
 
 # How to keep letsencrypt certs up to date.

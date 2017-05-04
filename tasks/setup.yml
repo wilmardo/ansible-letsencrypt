@@ -37,6 +37,14 @@
 
   when: letsencrypt_webserver == 'apache'
 
+- name: SETUP | Create /etc/letsencrypt nonexisting
+  file:
+    path: /etc/letsencrypt/
+    state: directory
+    owner: root
+    group: root
+    mode: 0775
+
 - name: SETUP | Create cli.ini
   template:
     src: cli.ini.jinja2

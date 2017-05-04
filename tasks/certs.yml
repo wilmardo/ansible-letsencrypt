@@ -1,7 +1,7 @@
 ---
 - block:
     - name: CERTS | Create certs when using webroot
-      command: "letsencrypt certonly --webroot -w {{ item.value.webroot }} -d {{ item.value.url }}"
+      command: "letsencrypt certonly --agree-tos --webroot -w {{ item.value.webroot }} -d {{ item.value.url }}"
       with_dict: "{{ letsencrypt_certs }}"
       when: letsencrypt_certs is defined and item.value.webroot is defined
 
@@ -12,7 +12,7 @@
             state: stopped
 
         - name: CERTS | Create certs when using certonly
-          command: "letsencrypt certonly --standalone -d {{ item.value.url }}"
+          command: "letsencrypt certonly --agree-tos --standalone -d {{ item.value.url }}"
           with_dict: "{{ letsencrypt_certs }}"
 
         - name: CERTS | Start nginx
@@ -22,15 +22,17 @@
 
       when: letsencrypt_certs is defined
 
-  when: letsencrypt_webserver == 'nginx' or (letsencrypt_apache_autoinstall == no and letsencrypt_apache_autogenerate == no)
+  when: letsencrypt_webserver == 'nginx' or (letsencrypt_apache_autoinstall == false and letsencrypt_apache_autogenerate == false)
 
 - block:
     - name: CERTS | Install certs for each Apache vhost
-      command: certbot --apache
+      command: letsencrypt --agree-tos --apache
       when: letsencrypt_apache_autoinstall
 
     - name: CERTS | Generate certs for each Apache vhost
-      command: certbot --apache
+      command: letsencrypt --agree-tos --apache
       when: letsencrypt_apache_autogenerate
 
-  when: letsencrypt_webserver is 'apache'
+  when: letsencrypt_webserver == 'apache'
+
+  #{'nextcloud': {'url': 'nextcloud.wilmardenouden.nl', 'ip': '192.168.121.249', 'port': 443}}

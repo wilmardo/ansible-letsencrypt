@@ -3,14 +3,14 @@
 # "--help" to learn more about the available options.
 
 # Use a 4096 bit RSA key instead of 2048
-rsa-key-size = "{{ letsencrypt_rsa-key-size }}
+rsa-key-size = {{ letsencrypt_rsa_key_size }}
 
 # Uncomment and update to register with the specified e-mail address
-email = "{{ letsencrypt_email }}
+email = {{ letsencrypt_email }}
 
 # Uncomment and update to generate certificates for the specified
 # domains.
-# domains = example.com, www.example.com
+domains ={% for item in letsencrypt_certs | list %} {{ letsencrypt_certs[item].url }} {% endfor %}
 
 # Uncomment to use a text interface instead of ncurses
 # text = True
@@ -21,9 +21,12 @@ email = "{{ letsencrypt_email }}
 
 # Uncomment to use the webroot authenticator. Replace webroot-path with the
 # path to the public_html / webroot folder being served by your web server.
-# authenticator = webroot
-%{ if letsencrypt_single_webroot is defined }%
+{% if letsencrypt_single_webroot != "none" %}
+authenticator = webroot
 webroot-path = "{{ letsencrypt_single_webroot }}"
-%{ endif }%
+{% else %}
+# authenticator = webroot
+# webroot-path = /usr/share/nginx/html
+{% endif %}
 
-"{{ letsencrypt_extra_conf }}"
+{{ letsencrypt_extra_conf }}
