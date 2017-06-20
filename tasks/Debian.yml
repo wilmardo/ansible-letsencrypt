@@ -1,0 +1,33 @@
+---
+- block:
+    - name: SETUP | Add backport repo
+        repo: deb http://ftp.debian.org/debian jessie-backports main
+        state: present
+
+    - name: SETUP | Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: SETUP | Install certbot
+      apt:
+        name: certbot
+        state: latest
+        default_release: jessie-backports"
+
+  when: ansible_distribution_release == '8'
+
+- include: script-install.yml
+  when: ansible_distribution_version == '7'
+
+- name: SETUP | Create /etc/letsencrypt folder when nonexisting
+  file:
+    path: /etc/letsencrypt
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: SETUP | Create cli.ini
+  template:
+    src: cli.ini.jinja2
+    dest: /etc/letsencrypt/cli.ini

@@ -1,38 +1,34 @@
 ---
-- block:
-    - name: CERTS | Create certs when using webroot
-      command: "letsencrypt certonly --agree-tos --webroot -w {{ item.value.webroot }} -d {{ item.value.url }}"
-      with_dict: "{{ letsencrypt_certs }}"
-      when: letsencrypt_certs is defined and item.value.webroot is defined
+- name: CERTS | Install certs for each Apache vhost or Nginx server block
+  command: "certbot --non-interactive --agree-tos --{{ letsencrypt_webserver }} --domains {{ item.value.domain }}"
+  with_dict: "{{ letsencrypt_certificates }}"
+  when: letsencrypt_autoinstall and item.value.webroot is undefined
 
-    - block:
-        - name: CERTS | Stop nginx
-          service:
-            name: nginx
-            state: stopped
+- name: CERTS | Generate certs for each Apache vhost or Nginx server block
+  command: "certbot --non-interactive --agree-tos --{{ letsencrypt_webserver }} certonly --domains {{ item.value.domain }}"
+  with_dict: "{{ letsencrypt_certificates }}"
+  when: letsencrypt_certonly and item.value.webroot is undefined
 
-        - name: CERTS | Create certs when using certonly
-          command: "letsencrypt certonly --agree-tos --standalone -d {{ item.value.url }}"
-          with_dict: "{{ letsencrypt_certs }}"
-
-        - name: CERTS | Start nginx
-          service:
-            name: nginx
-            state: started
-
-      when: letsencrypt_certs is defined
-
-  when: letsencrypt_webserver == 'nginx' or (letsencrypt_apache_autoinstall == false and letsencrypt_apache_autogenerate == false)
+- name: CERTS | Create certs when using webroot
+  command: "certbot certonly --non-interactive --agree-tos --webroot {{ item.value.webroot }} --domains {{ item.value.domain }}"
+  with_dict: "{{ letsencrypt_certificates }}"
+  when: item.value.webroot is defined
 
 - block:
-    - name: CERTS | Install certs for each Apache vhost
-      command: letsencrypt --agree-tos --apache
-      when: letsencrypt_apache_autoinstall
+    - name: CERTS | Stop webserver
+      service:
+        name: "{{ letsencrypt_webserver }}"
+        state: stopped
+      when: letsencrypt_webserver
 
-    - name: CERTS | Generate certs for each Apache vhost
-      command: letsencrypt --agree-tos --apache
-      when: letsencrypt_apache_autogenerate
+    - name: CERTS | Create certs when using certonly
+      command: "certbot certonly --non-interactive --agree-tos --standalone --domains {{ item.value.domain }}"
+      with_dict: "{{ letsencrypt_certificates }}"
 
-  when: letsencrypt_webserver == 'apache'
+    - name: CERTS | Start webserver
+      service:
+        name: "{{ letsencrypt_webserver }}"
+        state: started
+      when: letsencrypt_webserver
 
-  #{'nextcloud': {'url': 'nextcloud.wilmardenouden.nl', 'ip': '192.168.121.249', 'port': 443}}
+  when: letsencrypt_standalone

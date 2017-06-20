@@ -1,11 +1,15 @@
 ---
-- fail: msg="Variable '{{ item }}' is not defined"
+- fail:
+    msg: "Variable '{{ item }}' is not defined"
   when: item not in hostvars[inventory_hostname]
   with_items:
-   - letsencrypt_certs
-   - letsencrypt_email
+    - letsencrypt_certificates
+    - letsencrypt_email
 
-- include: setup.yml
+- include: "{{ ansible_distribution }}.yml"
+
 - include: certs.yml
+  when: letsencrypt_certificates is defined
+
 - include: cron.yml
   when: letsencrypt_auto_renew

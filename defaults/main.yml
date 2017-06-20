@@ -1,17 +1,16 @@
 ---
 # Config vars
-letsencrypt_webserver: nginx # nginx or apache
-letsencrypt_apache_autoinstall: no
-letsencrypt_apache_autogenerate: no
+letsencrypt_webserver: "apache" # nginx, apache or empty string
+letsencrypt_autoinstall: yes
+letsencrypt_certonly: no
+letsencrypt_standalone: no
 
 # Certbot vars
-letsencrypt_email: none
 letsencrypt_rsa_key_size: 2048
-letsencrypt_single_webroot: none
 letsencrypt_extra_conf: ""
 
 # How to keep letsencrypt certs up to date.
 letsencrypt_auto_renew: yes
 letsencrypt_auto_renew_user: "{{ ansible_user }}"
-letsencrypt_auto_renew_hour: 3
-letsencrypt_auto_renew_minute: 30
+letsencrypt_auto_renew_hour: "{{ 24 | random(seed=inventory_hostname) }}"
+letsencrypt_auto_renew_minute: "{{ 60 | random(seed=inventory_hostname) }}"

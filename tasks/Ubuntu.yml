@@ -1,0 +1,44 @@
+---
+- block:
+    - name: SETUP | Add certbot repository
+      apt_repository:
+        repo: ppa:certbot/certbot
+
+    - name: SETUP | Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: SETUP | Install certbot-nginx
+      apt:
+        name: python-certbot-nginx
+        state: latest
+      when: letsencrypt_webserver == 'nginx'
+
+    - name: SETUP | Install certbot-apache
+      apt:
+        name: python-certbot-apache
+        state: latest
+      when: letsencrypt_webserver == 'apache'
+
+    - name: SETUP | Create cli.ini
+      template:
+        src: cli.ini.jinja2
+        dest: /etc/letsencrypt/cli.ini
+
+  when: ansible_distribution_release >= '14.04'
+
+- include: script-install.yml
+  when: ansible_distribution_release < '14.04'
+
+- name: SETUP | Create /etc/letsencrypt folder when nonexisting
+  file:
+    path: /etc/letsencrypt
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: SETUP | Create cli.ini
+  template:
+    src: cli.ini.jinja2
+    dest: /etc/letsencrypt/cli.ini

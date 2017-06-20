@@ -1,0 +1,31 @@
+---
+- name: SETUP | Install epel-release
+  yum:
+    name: epel-release
+    state: latest
+    update_cache: yes
+
+- name: SETUP | Install certbot-nginx
+  yum:
+    name: python-certbot-nginx
+    state: latest
+  when: letsencrypt_webserver == 'nginx'
+
+- name: SETUP | Install certbot-apache
+  yum:
+    name: python-certbot-apache
+    state: latest
+  when: letsencrypt_webserver == 'apache'
+
+- name: SETUP | Create /etc/letsencrypt folder when nonexisting
+  file:
+    path: /etc/letsencrypt
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: SETUP | Create cli.ini
+  template:
+    src: cli.ini.jinja2
+    dest: /etc/letsencrypt/cli.ini
