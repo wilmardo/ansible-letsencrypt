@@ -1,4 +1,4 @@
-Letsencrypt [![Build Status](https://travis-ci.org/wilmardo/ansible-letsencrypt.svg?branch=master)](https://travis-ci.org/wilmardo/ansible-letsencrypt)
+Letsencrypt [![Build Status](https://travis-ci.org/wilmardo/ansible-role-letsencrypt.svg?branch=master)](https://travis-ci.org/wilmardo/ansible-role-letsencrypt)
 =========
 
 Ansible role to create letsencrypt certificates
