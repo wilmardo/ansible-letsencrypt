@@ -4,5 +4,5 @@
 rsa-key-size = {{ letsencrypt_rsa_key_size }}
 email = {{ letsencrypt_email }}
 {% if letsencrypt_extra_conf %}
-"{{ letsencrypt_extra_conf }}"
+{{ letsencrypt_extra_conf }}
 {% endif %}
