@@ -22,7 +22,7 @@
       service:
         name: "{{ letsencrypt_webserver }}"
         state: stopped
-      when: letsencrypt_webserver
+      when: letsencrypt_webserver != ""
 
     - name: CERTS | Create certs when using certonly
       command: "certbot certonly --non-interactive --agree-tos --standalone --domains {{ item.value.domain }}"
@@ -32,6 +32,6 @@
       service:
         name: "{{ letsencrypt_webserver }}"
         state: started
-      when: letsencrypt_webserver
+      when: letsencrypt_webserver != ""
 
   when: letsencrypt_standalone or letsencrypt_webserver == ""
