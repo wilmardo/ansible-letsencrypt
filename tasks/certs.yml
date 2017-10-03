@@ -1,17 +1,17 @@
 ---
 - block:
     - name: CERTS | Install certs for each Apache vhost or Nginx server block
-      command: "certbot --non-interactive --agree-tos --{{ letsencrypt_webserver }} --domains {{ item.value.domain }} {% for rewrite in item.value.rewrites|default() %} {{ rewrite }} {% endfor %}"
+      command: "certbot -n --agree-tos --{{ letsencrypt_webserver }} --expand -d {{ item.value.domain }} {% for rewrite in item.value.rewrites|default() %} -d {{ rewrite }} {% endfor %}"
       with_dict: "{{ letsencrypt_certificates }}"
       when: letsencrypt_autoinstall and item.value.webroot is undefined
 
     - name: CERTS | Generate certs for each Apache vhost or Nginx server block
-      command: "certbot --non-interactive --agree-tos --{{ letsencrypt_webserver }} certonly --domains {{ item.value.domain }} {% for rewrite in item.value.rewrites|default() %} {{ rewrite }} {% endfor %}"
+      command: "certbot -n --agree-tos --{{ letsencrypt_webserver }} certonly --expand -d {{ item.value.domain }} {% for rewrite in item.value.rewrites|default() %} -d {{ rewrite }} {% endfor %}"
       with_dict: "{{ letsencrypt_certificates }}"
       when: letsencrypt_certonly and item.value.webroot is undefined
 
     - name: CERTS | Create certs when using webroot
-      command: "certbot certonly --non-interactive --agree-tos --webroot {{ item.value.webroot }} --domains {{ item.value.domain }} {% for rewrite in item.value.rewrites|default() %} {{ rewrite }} {% endfor %}"
+      command: "certbot certonly -n --agree-tos --webroot {{ item.value.webroot }} --expand -d {{ item.value.domain }} {% for rewrite in item.value.rewrites|default() %} -d {{ rewrite }} {% endfor %}"
       with_dict: "{{ letsencrypt_certificates }}"
       when: item.value.webroot is defined
 
@@ -25,7 +25,7 @@
       when: letsencrypt_webserver != ""
 
     - name: CERTS | Create certs when using certonly
-      command: "certbot certonly --non-interactive --agree-tos --standalone --domains {{ item.value.domain }} {% for rewrite in item.value.rewrites|default() %} {{ rewrite }} {% endfor %}"
+      command: "certbot certonly -n --agree-tos --standalone --expand -d {{ item.value.domain }} {% for rewrite in item.value.rewrites|default() %} -d {{ rewrite }} {% endfor %}"
       with_dict: "{{ letsencrypt_certificates }}"
 
     - name: CERTS | Start webserver
